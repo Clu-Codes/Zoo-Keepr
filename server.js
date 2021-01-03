@@ -1,5 +1,6 @@
 const express = require('express');
 // This code is used to instantiate the server; express is assigned to the app variable so that we can chain methods to the express.js server
+const PORT = process.env.PORT || 3001;
 const app = express();
 const { animals } = require('./data/animals.json');
 
@@ -49,8 +50,8 @@ app.get('/api/animals', (req, res) => {
 });
 
 // To have our servers listen to these requests, we need to chain the listen() method to the server with the following code:
-app.listen(3001, () => {
-    console.log(`API server now on port 3001!`);
+app.listen(PORT, () => {
+    console.log(`API server now on port ${PORT}!`);
 });
 
 

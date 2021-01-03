@@ -37,6 +37,11 @@ function filterByQuery(query, animalsArray) {
     return filteredResults;
 }
 
+function findById(id, animalsArray) {
+    const result = animalsArray.filter(animal => animal.id === id)[0];
+    return result;
+}
+
 // To add the route, add the following code before app.listen.
 // The get() method takes two parameters, the first is the route the client will have to fetch from. The second is a callback function that executes every time that route is accessed with a GET request. 
 app.get('/api/animals', (req, res) => {
@@ -47,6 +52,16 @@ app.get('/api/animals', (req, res) => {
         results = filterByQuery(req.query, results);
     }
     res.json(results);
+});
+// To return one specific animal - we use the req.params method, which is defined in the route path ('/api/animals/:id')
+// PARAM ROUTES MUST COME AFTER THE GET ROUTE
+app.get('/api/animals/:id', (req, res) => {
+    const result = findById(req.params.id, animals);
+    if (result) {
+        res.json(result);
+    } else {
+        res.sendStatus(404);
+    }
 });
 
 // To have our servers listen to these requests, we need to chain the listen() method to the server with the following code:

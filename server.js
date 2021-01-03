@@ -1,7 +1,16 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 // This code is used to instantiate the server; express is assigned to the app variable so that we can chain methods to the express.js server
 const PORT = process.env.PORT || 3001;
 const app = express();
+    // ===MIDDLEWARE=== 
+    // parse incoming string or array data
+    app.use(express.urlencoded({ extended: true })); /* This is a method built into express.js to take incoming POST data and convert it to key value pairs. The ({ extended: true }) option set inside the method call informs the server to look for nested sub-array data as deeply as possible */
+
+    // parse incoming JSON data to req.body
+    app.use (express.json());
+    // ===MIDDLEWARE ENDS===
 const { animals } = require('./data/animals.json');
 
 // function to take in req.query as an argument and filter through the animals, returning a new filtered array.
@@ -40,6 +49,37 @@ function filterByQuery(query, animalsArray) {
 function findById(id, animalsArray) {
     const result = animalsArray.filter(animal => animal.id === id)[0];
     return result;
+};
+
+function createNewAnimal(body, animalsArray) {
+    const animal = body;
+    animalsArray.push(animal);
+    fs.writeFileSync(
+
+        // this is determining the pathing for where we are adding the new data - in this instance, we are adding a new animal to the animals.json so that new data doesn't exist only on the server. 
+        path.join(__dirname, './data/animals.json'),
+
+        // then, we are converting the array data to JSON. The two arguments, null & 2, are for formatting. Null means that we don't want to edit any of our existing data. The 2 means we want to crete white space between our values - this helps for readability. 
+        JSON.stringify({ animals: animalsArray }, null, 2)
+    );
+    return animal;
+};
+
+// In this function, the animal parameter is the content from req.body, which is what is being validated. 
+function validateAnimal(animal) {
+    if (!animal.name || typeof animal.name !== 'string') {
+        return false;
+    }
+    if (!animal.species || typeof animal.species !== 'string') {
+        return false;
+    }
+    if (!animal.diet || typeof animal.diet !== 'string') {
+        return false; 
+    }
+    if (!animal.personalityTraits || typeof animal.personalityTraits !== 'string') {
+        return false;
+    }
+    return true;
 }
 
 // To add the route, add the following code before app.listen.
@@ -63,6 +103,22 @@ app.get('/api/animals/:id', (req, res) => {
         res.sendStatus(404);
     }
 });
+
+app.post('/api/animals', (req, res) => {
+    // set id based on what the next index of the array will be - if array length is 9, the next id will be 10. 
+    req.body.id = animals.length.toString();
+
+    // if any data in req.body is incorrect, send 400 error back
+    if (!validateAnimal(req.body)) {
+        res.status(400).send('The animal is not properly formatted.');
+    } else {
+        // call createNewAnimal function above, pass two arguments
+        const animal = createNewAnimal(req.body, animals);
+        res.json(animal);
+    }
+});
+
+
 
 // To have our servers listen to these requests, we need to chain the listen() method to the server with the following code:
 app.listen(PORT, () => {

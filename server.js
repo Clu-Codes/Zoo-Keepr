@@ -125,8 +125,12 @@ app.post('/api/animals', (req, res) => {
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
 });
-
-
+app.get('/animals', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+app.get('/zookeepers', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
 
 // To have our servers listen to these requests, we need to chain the listen() method to the server with the following code:
 app.listen(PORT, () => {

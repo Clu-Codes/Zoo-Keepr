@@ -10,6 +10,9 @@ const app = express();
 
     // parse incoming JSON data to req.body
     app.use (express.json());
+
+    // Middleware for certain front-end files to be made available - using the express.static() method, we can instruct that everything in a given location (in this case the 'public' folder) to be a static resource, allowing it to be accessed without creating a specific server endpoint. 
+    app.use(express.static('public'));
     // ===MIDDLEWARE ENDS===
 const { animals } = require('./data/animals.json');
 
@@ -116,6 +119,11 @@ app.post('/api/animals', (req, res) => {
         const animal = createNewAnimal(req.body, animals);
         res.json(animal);
     }
+});
+
+// The '/' brings us to the root route of the server, which is used to create a homepage for the server. This GET route has one job, and that is to respond with an HTML page to display in the browser - this is what the sendFile() method is accomplishing. It is using the path module to ensure that the correct location for the HTML is used. 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
 });
 
 

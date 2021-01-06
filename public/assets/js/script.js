@@ -1,4 +1,7 @@
+// const { post } = require("../../../routes/apiRoutes");
+
 const $animalForm = document.querySelector('#animal-form');
+const $zookeeperForm = document.querySelector('#zookeeper-form');
 
 const handleAnimalFormSubmit = event => {
   event.preventDefault();
@@ -26,14 +29,14 @@ const handleAnimalFormSubmit = event => {
   }
   const animalObject = { name, species, diet, personalityTraits };
 
-   // Using Fetch API to Post newly entered data to server. Specifies method(POST), headers(JSON data), body(the JSON data itself) - we don't specify the entire URL because the request is coming from the server, so '/api/animals' will do.
-  fetch('/api/animals', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(animalObject)
+// Using Fetch API to Post newly entered data to server. Specifies method(POST), headers(JSON data), body(the JSON data itself) - we don't specify the entire URL because the request is coming from the server, so '/api/animals' will do.
+fetch('/api/animals', {
+method: 'POST',
+headers: {
+  Accept: 'application/json',
+  'Content-Type': 'application/json'
+},
+body: JSON.stringify(animalObject)
   })
   .then(response => {
     if (response.ok) {
@@ -47,5 +50,37 @@ const handleAnimalFormSubmit = event => {
   });
 };
 
+  const handleZookeeperFormSubmit = event => {
+    event.preventDefault();
 
+    // get zookeeper data and organize it
+    const name = $zookeeperForm.querySelector('[name="zookeeper-name"]').value;
+    const age = parseInt($zookeeperForm.querySelector('[name="age"]').value);
+    const favoriteAnimal = $zookeeperForm.querySelector('[name="favorite-animal"]').value;
+
+    const zookeeperObj = { name, age, favoriteAnimal };
+    console.log(zookeeperObj);
+    fetch('api/zookeepers', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(zookeeperObj)
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        alert('Error: ' + response.statusText);
+      })
+      .then(postResponse => {
+        console.log(postResponse);
+        alert('Thanks for adding a zookeeper!')
+      });
+  };
+
+
+
+$zookeeperForm.addEventListener('submit', handleZookeeperFormSubmit);
 $animalForm.addEventListener('submit', handleAnimalFormSubmit);
